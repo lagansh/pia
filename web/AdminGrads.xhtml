@@ -1,0 +1,206 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Admin - Gradske linije</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"/>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+        <script>
+            function validateNum() {
+                // var x = document.getElementById("rbr").innerHTML;
+                document.getElementById("alertrbr").innerHTML = "Proizvodnja";
+            }
+        </script>
+    </h:head>
+    <h:body>
+
+        <h:form id="Navigacija">
+            <div class="fixed-top">
+                <nav class="navbar navbar-expand-sm bg-light">
+                    <div class="col-md-4">
+                        <ui class="navbar-nav">
+                            <li class="nav-item">
+                                <div class="nav-link text-info"><b>Administrator:</b></div>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminGrads" >
+                                    Gradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="newxhtml">
+                                    Medjugradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminRequests">
+                                    Zahtevi
+                                </p:commandLink>
+                            </li>
+                        </ui>
+                    </div>
+                    <div class="col-md-4"/>
+                    <div class="col-md-4 text-right">
+                        <h:commandLink styleClass="text-info" value="Logout" action="#{loginctrl.LogOut()}"/>
+                    </div>
+                </nav>
+            </div>
+        </h:form>
+        <br/><br/>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h3 class="text-info">Gradske linije</h3><p>Dodavanje novih gradskih linija i novih vozaca</p>
+            </div>
+        </div>
+        <div class="row justify-content-around">
+
+            <div class="col-md-4">
+                <h:form id="lin">
+                    <h2 class="text-info">Dodaj liniju</h2><br/>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 1" styleClass="#{admingradske.step eq 0? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 2" styleClass="#{admingradske.step eq 1? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 3" styleClass="#{admingradske.step eq 2? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 4" styleClass="#{admingradske.step eq 3? 'nav-link active':'nav-link'}"/>
+                        </li>
+                    </ul>
+                    <h:panelGrid columns="3" rendered="#{admingradske.step eq 0}">
+
+                        <h:outputLabel value="Redni broj:" styleClass="control-label"/>
+                        <h:inputText id="rbr" value="#{admingradske.rbr}" styleClass="form-control" onblur="validateNum()" />
+                        <h:message for="rbr"/>
+
+                        <h:outputLabel value="Polaziste:" styleClass="control-label"/>
+                        <h:inputText id="polaziste" styleClass="form-control" value="#{admingradske.polaziste}"/>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Odrediste:" styleClass="control-label"/>
+                        <h:inputText id="odrediste" styleClass="form-control" value="#{admingradske.odrediste}"/>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Broj medjustanica:" styleClass="control-label"/>
+                        <h:inputText id="brmedjustanice" styleClass="form-control" value="#{admingradske.brMedjustanica}"/>
+                        <h:message for="brmedjustanice" />
+                    </h:panelGrid>
+                    <br/>
+                    <h:panelGrid columns="3" rendered="#{admingradske.step eq 1}">
+                        <c:forEach items="#{admingradske.medjustaniceGradske}" var="j">
+                            <c:if test="#{j.id == 0}">
+                                <h:outputLabel value="Medjustanica:" styleClass="control-label"/>
+                                <h:inputText styleClass="form-control" value="#{j.naziv}"/>
+                                <h:panelGroup/>
+                            </c:if>
+                        </c:forEach>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" rendered="#{admingradske.step eq 2}">
+                        <c:forEach items="#{admingradske.medjustaniceGradske}" var="k">
+                            <h:column>
+                                <f:facet name="header">Stanica</f:facet>
+                                <h:outputLabel value="#{k.naziv}" styleClass="control-label"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">Polazak</f:facet>
+                                <p:calendar id="time" value="#{k.polazak}" pattern="HH:mm" timeOnly="true"/>
+                             <!--   <h:inputText value="#{k.polazak}" styleClass="form-control" >
+                                    <f:convertDateTime pattern="HH:mm"/>
+                                </h:inputText> -->
+                            </h:column>
+                        </c:forEach>
+                    </h:panelGrid>
+                    <h:panelGrid columns="2" rendered="#{admingradske.step eq 3}">
+                        <h:column>
+                            <h:outputLabel styleClass="control-label" value="Vozac linije:"/>
+                            <h:selectOneMenu value="#{admingradske.izabrani_vozac}" styleClass="form-control">
+                                <f:selectItem itemLabel="- - Izaberite prevoznika - -" itemValue="0"/>
+                                <f:selectItems value="#{admingradske.vozaci}" var="pr" itemLabel="#{pr.ime} #{pr.prezime}" itemValue="#{pr.id}"/>
+                            </h:selectOneMenu>
+                        </h:column>
+                    </h:panelGrid>
+                    <br/>
+                    <h:commandButton action="#{admingradske.dalje()}" value="Dalje" styleClass="btn active offset-md-6">
+                        <f:ajax execute="lin" render="@form"/>
+                    </h:commandButton>
+
+                </h:form>
+            </div>
+            <div class="col-md-4">
+                <h:form id="vozacgr">
+                    <h2 class="text-info">Dodaj vozaca</h2><br/>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Ime:" styleClass="control-label"/>
+                        <h:inputText id="ime" styleClass="form-control" value="#{admingradske.voz.ime}" required="true" requiredMessage="Unesite ime!"/>
+                        <h:message for="ime" style="color:red"/>
+
+                        <h:outputLabel value="Prezime:" styleClass="control-label"/>
+                        <h:inputText id="prez" styleClass="form-control" value="#{admingradske.voz.prezime}" required="true" requiredMessage="Unesite prezime!"/>
+                        <h:message for="prez" style="color:red"/>
+
+                        <h:outputLabel value="Datum rodjenja:" styleClass="control-label"/>
+                        <p:calendar id="rod" value="#{admingradske.voz.dtmRodj}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        <h:message for="rod" style="color:red"/>
+
+                        <h:outputLabel value="Poceo da radi:" styleClass="control-label"/>
+                        <p:calendar id="poc" value="#{admingradske.voz.dtmPoceo}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        <h:message for="poc" style="color:red"/>
+                    </h:panelGrid>
+                    <br/>
+                    <p:commandButton action="#{admingradske.saveVozac()}" value="Dodaj" styleClass="btn btn-info offset-md-6" ajax="true" update="@all"/>
+                </h:form>
+            </div>
+        </div>
+        <br/>
+        <h:form>
+            <div class="row justify-content-around">
+                <div class="col-md-4 align-items-center">
+                    <p:commandButton value="Otkazi liniju" styleClass="btn btn-info"  onclick="PF('dlg1').show();return false;" ajax="true" update="@all"/>
+                </div>
+                <div class="col-md-4"/>
+            </div>
+
+        </h:form>
+        <h:form>
+            <p:dialog header="Otkazi liniju" widgetVar="dlg1" >
+                <h:panelGrid columns="3">
+                    <p:outputLabel value="Linija:"/>
+                    <p:inputText id="rbrlin" value="#{otkaz.ol.rbrLinije}" required="true" requiredMessage="Unesite broj linije!"/>
+                    <h:message for="rbrlin"/>
+
+                    <p:outputLabel value="Otkazana od:"/>
+                    <p:calendar id="otkazod" value="#{otkaz.ol.otkazod}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                    <h:message for="otkazod"/>
+
+                    <p:outputLabel  value="Otkazana do:"/>
+                    <p:calendar id="otkazdo" value="#{otkaz.ol.otkazdo}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                    <h:message for="otkazdo"/>
+
+                    <p:commandButton styleClass="btn btn-info" value="Otkazi" action="#{otkaz.OtkaziLiniju()}" ajax="true" update="@all"/>
+                </h:panelGrid>
+            </p:dialog>
+        </h:form>
+        <br/><br/>
+        <footer class="fixed-bottom bg-light">
+            <div class="container-fluid text-center">
+                <p><b>© 2018 Copyright:</b> Djordje Malesevic 0399/2015</p>
+            </div>
+        </footer>
+    </h:body>
+</html>
