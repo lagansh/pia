@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Admin - zahtevi</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"/>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+        <h:form id="Navigacija">
+            <div class="fixed-top">
+                <nav class="navbar navbar-expand-sm bg-light">
+                    <div class="col-md-4">
+                        <ui class="navbar-nav">
+                            <li class="nav-item">
+                                <div class="nav-link text-info"><b>Administrator:</b></div>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminGrads">
+                                    Gradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="newxhtml">
+                                    Medjugradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminRequests">
+                                    Zahtevi
+                                </p:commandLink>
+                            </li>
+                        </ui>
+                    </div>
+                    <div class="col-md-4"/>
+                    <div class="col-md-4 text-right">
+                        <h:commandLink styleClass="text-info" value="Logout" action="#{loginctrl.LogOut()}"/>
+                    </div>
+                </nav>
+            </div>
+        </h:form>
+        <br/><br/>
+        <div class="jumbotron jumbotron-fluid">
+            <div class="container">
+                <h3 class="text-info">Zahtevi</h3><p>Odobravanje/odbijanje zahteva za registracijom, za rezervacijama karata, mesecnih/godisnjih kartica</p>
+            </div>
+        </div>
+
+        <div class="row justify-content-around">
+            <div class="col-md-4">
+                <h:form>
+                    <h2 class="text-info">Zahtev za registracijom</h2><br/>
+                    <h:dataTable styleClass="table table-striped table-bordered" value="#{adminreq.korisnici}" var="kor">
+                        <h:column>
+                            <f:facet name="header">Username</f:facet>
+                            <h:outputText value="#{kor.username}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Ime</f:facet>
+                            <h:outputText value="#{kor.ime}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Prezime</f:facet>
+                            <h:outputText value="#{kor.prezime}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odobri</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odobri" action="#{adminreq.Odobri(kor)}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odbij</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odbij" action="#{adminreq.Odbij(kor)}"/>
+                        </h:column>
+                    </h:dataTable>
+                </h:form>
+            </div>
+            <div class="col-md-4">
+                <h:form>
+                    <h2 class="text-info">Zahtevi za gradsku rezervaciju</h2><br/>
+                    <h:dataTable styleClass="table table-striped table-bordered" value="#{adminreq.gradskeRez}" var="i">
+                        <h:column>
+                            <f:facet name="header">Username</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.user}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Trajanje</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.trajanje eq 1?'Mesecna':'Godisnja'} kartica"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Cena</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.cena}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odobri</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odobri" action="#{adminreq.odobriKartuGr(i)}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odbij</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odbij" action="#{adminreq.odbijKartuGr(i)}"/>
+                        </h:column>
+                    </h:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <div class="row justify-content-center">
+            <div class="col-md-4">
+                <h:form>
+                    <h2 class="text-info">Zahtevi za medjugradsku rezervaciju</h2><br/>
+                    <h:dataTable styleClass="table table-striped table-bordered" value="#{adminreq.mgrRez}" var="i">
+                        <h:column>
+                            <f:facet name="header">Username</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.user}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Prevoznik</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.prevoznik}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Od-Do</f:facet>
+                            <h:outputLabel styleClass="control-label" value="#{i.od_do}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odobri</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odobri" action="#{adminreq.odobriKartuMgr(i)}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Odbij</f:facet>
+                            <h:commandLink styleClass="text-info" value="Odbij" action="#{adminreq.odbijKartuMgr(i)}"/>
+                        </h:column>
+                    </h:dataTable>
+                </h:form>
+            </div>
+        </div>
+        <br/><br/>
+        <footer class="fixed-bottom bg-light">
+            <div class="container-fluid text-center">
+                <p><b>© 2018 Copyright:</b> Djordje Malesevic 0399/2015</p>
+            </div>
+        </footer>
+    </h:body>
+</html>

@@ -1,0 +1,309 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Registrovani korisnik</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"/>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+    <h:body>
+        <h:form id="form">
+            <div class="fixed-top">
+                <nav class="navbar navbar-expand-sm bg-light">
+                    <div class="col-md-4">
+                        <ui class="navbar-nav">
+                            <li class="nav-item">
+                                <div class="nav-link text-info"><b>Korisnik:</b> #{loginctrl.username}</div>
+                            </li>
+                            <li class="nav-item active">
+                                <p:commandLink styleClass="nav-link text-info" action="#{regkor.navKlik(0)}" update="@all">
+                                    Gradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="#{regkor.navKlik(1)}" update="@all" ajax="true">
+                                    Medjugradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="#{regkor.navKlik(2)}" update="@all" ajax="true">
+                                    Rezervacija karata
+                                </p:commandLink>
+                            </li>
+                        </ui>
+                    </div>
+                    <div class="col-md-4"/>
+                    <div class="col-md-4 text-right">
+                        <h:commandLink styleClass="text-info" value="Logout" action="#{loginctrl.LogOut()}"/>
+                    </div>
+                </nav>
+            </div>
+        </h:form>
+        <br/><br/><br/>
+        <h:form rendered="#{regkor.navTab eq 0}" id="gradske">
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h3 class="text-info">Gradske linije</h3>
+                </div>
+            </div>
+            <div class="row justify-content-around">
+                <div class="col-md-4">
+                    <h2 class="text-info">Sve gradske linije:</h2><br/>
+                    <p:dataTable value="#{regkor.gradske_ukupno}" widgetVar="linije" filteredValue="#{regkor.filtered}" selectionMode="single" selection="#{regkor.izabranaLinijaRV}" var="li" rowKey="#{li.rbr}" paginator="true" rows="10" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" rowsPerPageTemplate="5,10,15">
+                        <p:ajax event="rowSelect" update=":gradske:panel0" oncomplete="PF('dlgRedvoznje').show();" />
+                        <f:facet name="header">
+                            <p:outputPanel>
+                                <h:outputText value="Medjustanica:" />
+                                <p:inputText onkeyup="PF('linije').filter()" id="globalFilter"/>
+                            </p:outputPanel>
+                        </f:facet>
+                        <p:column headerText="Broj linije" filterBy="#{li.rbr}" filterMatchMode="contains">
+                            <h:outputText value="#{li.rbr}"/>
+                        </p:column>
+                        <p:column headerText="Pocetna" filterBy="#{li.pocetna}" filterMatchMode="contains">
+                            <h:outputText value="#{li.pocetna}"/>
+                        </p:column>
+                        <p:column headerText="Odredisna" filterBy="#{li.odredisna}" filterMatchMode="contains">
+                            <h:outputText value="#{li.odredisna}"/>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dialog header="Red voznje" widgetVar="dlgRedvoznje" hideEffect="fade" showEffect="fade">
+                        <p:outputPanel id="panel0">
+                            <h:dataTable value="#{regkor.izabranaLinijaRV.redvz}" var="i" border="1">
+                                <f:facet name="header">Broj linije: #{regkor.izabranaLinijaRV.rbr}</f:facet>
+                                <h:column>
+                                    <f:facet name="header">Stanica</f:facet>
+                                    <h:outputText value="#{i.stanica}"/>
+                                </h:column>
+                                <h:column>
+                                    <f:facet name="header">Vreme</f:facet>
+                                    <h:outputText value="#{i.polazak}">
+                                        <f:convertDateTime pattern="HH:mm" />
+                                    </h:outputText>
+                                </h:column>
+                            </h:dataTable>
+                        </p:outputPanel>
+                    </p:dialog>
+                </div>    
+            </div>
+        </h:form>
+        <h:form rendered="#{regkor.navTab eq 1}" id="medjugradske">
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h3 class="text-info">Medjugradske linije</h3>
+                </div>
+            </div>
+            <div class="row justify-content-around">
+                <div class="col-md-8">
+                    <h2 class="text-info">Sve medjugradske linije:</h2><br/>
+                    <p:dataTable  id="tablica" value="#{regkor.results}" filteredValue="#{regkor.resultsF}" selection="#{regkor.izabranaMedjugradska}" selectionMode="single" rowKey="#{ml.id}" widgetVar="linijemedju" var="ml" paginator="true" rows="20" paginatorTemplate="{RowsPerPageDropdown} {FirstPageLink} {PreviousPageLink} {CurrentPageReport} {NextPageLink} {LastPageLink}" rowsPerPageTemplate="20">
+                        <p:ajax event="rowSelect" update=":medjugradske:panel1" oncomplete="PF('dlgMedju').show();" listener="#{regkor.loadDetails()}"/>
+                        <p:ajax event="filter" update="@all"/>
+                        <p:column headerText="Prevoznik" filterBy="#{ml.prevoznik}" filterMatchMode="contains" >
+                            <h:outputText value="#{ml.prevoznik}" />
+                        </p:column>
+                        <p:column headerText="Pocetna" filterBy="#{ml.pocetna}" filterMatchMode="contains">
+                            <h:outputText value="#{ml.pocetna}" />
+                        </p:column>
+                        <p:column headerText="Odredisna" filterBy="#{ml.odredisna}" filterMatchMode="contains">
+                            <h:outputText value="#{ml.odredisna}" />
+                        </p:column>
+                        <p:column headerText="Polazak" filterBy="#{ml.polazak}" filterMatchMode="contains">
+                            <h:outputText value="#{ml.polazak}" />
+                        </p:column>
+                        <p:column headerText="Dolazak" filterBy="#{ml.dolazak}" filterMatchMode="contains">
+                            <h:outputText value="#{ml.dolazak}" />
+                        </p:column>
+                        <p:column headerText="Medjustanice" filterBy="#{ml.medjustanice}" filterMatchMode="contains">
+                            <h:outputText value="#{ml.medjustanice}" />
+                        </p:column>
+                        <p:column>
+                            <p:commandLink id="asd" value="Rezervisi kartu">
+                                <p:ajax update=":medjugradske:panel0" oncomplete="PF('dlgMedju0').show();" listener="#{regkor.addReservationMgr(ml)}" />
+                            </p:commandLink>
+                        </p:column>
+                    </p:dataTable>
+                    <p:dialog header="Red voznje" widgetVar="dlgMedju0" hideEffect="fade" showEffect="fade" height="250" width="400">
+                        <p:outputPanel id="panel0">
+                            <h3>Uspesno ste poslali zahtev za rezervaciju</h3>
+                        </p:outputPanel>
+                    </p:dialog>
+                    <p:dialog header="Red voznje" widgetVar="dlgMedju" hideEffect="fade" showEffect="fade" height="500" width="1000">
+                        <p:scrollPanel mode="native">
+                            <p:outputPanel id="panel1">
+                                <p:panelGrid columns="1">
+                                    <p:commandLink id="asd" value="Rezervisi kartu">
+                                        <p:ajax update=":medjugradske:panel0" oncomplete="PF('dlgMedju0').show();" listener="#{regkor.addReservationMgr(ml)}" />
+                                    </p:commandLink>
+                                </p:panelGrid>
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        Informacije o liniji:
+                                    </f:facet>
+
+                                    <p:outputLabel value="Prevoznik:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.prevoznik}" />
+
+                                    <p:outputLabel value="Pocetna:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.pocetna}" />
+
+                                    <p:outputLabel value="Odredisna:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.odredisna}" />
+
+                                    <p:outputLabel value="Polazak:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.polazak}" />
+
+                                    <p:outputLabel value="Dolazak:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.dolazak}" />
+
+                                    <p:outputLabel value="Medjustanice:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.medjustanice}" />
+                                </p:panelGrid>
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        Informacije o vozacu:
+                                    </f:facet>
+                                    <p:outputLabel value="Ime i prezime:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.voz.ime} #{regkor.izabranaMedjugradska.voz.prezime}" />
+
+                                    <p:outputLabel value="Datum rodjenja:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.voz.datum_rodj}">
+                                        <f:convertDateTime pattern="dd.mm.yyyy" />
+                                    </h:outputText>
+
+                                    <p:outputLabel value="Poeceo da radi:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.voz.started_working}">
+                                        <f:convertDateTime pattern="dd.mm.yyyy" />
+                                    </h:outputText>
+                                </p:panelGrid>
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        Informacije o autobusu:
+                                    </f:facet>
+                                    <p:outputLabel value="Marka:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.bus.marka}" />
+
+                                    <p:outputLabel value="Model:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.bus.model}"/>
+
+                                    <p:outputLabel value="Broj slobodnih sedista:" />
+                                    <h:outputText value="#{regkor.izabranaMedjugradska.bus.br_sedista}"/>
+                                </p:panelGrid>
+                                <p:panelGrid columns="2">
+                                    <f:facet name="header">
+                                        Fotografije autobusa:
+                                    </f:facet>
+                                    <p:galleria value="#{regkor.slike}" var="i" panelWidth="250" panelHeight="156" showCaption="true">
+                                        <p:graphicImage value="#{i}">
+                                            <f:param name="sisea" value="#{regkor.id}"/>
+                                        </p:graphicImage>
+                                    </p:galleria>
+                                </p:panelGrid>
+                            </p:outputPanel>
+                        </p:scrollPanel>
+                    </p:dialog>
+                </div>
+            </div>
+        </h:form>
+        <h:form rendered="#{regkor.navTab eq 2}" id="rezervacije">
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h3 class="text-info">Rezervacije</h3>
+                    <p>Rezervisite mesecne ili godisnje kartice</p>
+                </div>
+            </div>
+            <div class="row justify-content-around">
+                <div class="col-md-4">
+                    <h3 class="text-info">Gradske mesecnih/godisnjih kartica</h3><br/>
+                    <h:dataTable style="form-control" value="#{regkor.zahtevi}" var="i" border="1">
+                        <h:column>
+                            <f:facet name="header">
+                                Zahtev
+                            </f:facet>
+                            <h:outputLabel styleClass="control-label text-info" value="Zahtev za mesecnu karticu" rendered="#{i.trajanje eq 1}"/>
+                            <h:outputLabel styleClass="control-label text-warning" value="Zahtev za godisnju karticu" rendered="#{i.trajanje eq 12}"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">
+                                Status zahteva
+                            </f:facet>
+                            <h:outputLabel styleClass="control-label text-muted" value="Neobradjen" rendered="#{i.status eq 0}"/>
+                            <h:outputLabel styleClass="control-label text-danger" value="Odbijen" rendered="#{i.status eq -1}"/>
+                            <h:outputLabel styleClass="control-label text-success" value="Prihvacen" rendered="#{i.status eq 1}"/>
+                        </h:column>
+                        <h:column> 
+                            <f:facet name="header">
+                                Cena
+                            </f:facet>
+                            <h:outputLabel value="#{i.cena} rsd" styleClass="control-label text-center" />
+                        </h:column>   
+
+                    </h:dataTable>
+                </div>
+                <div class="col-md-4">
+                    <h:form id="rezervacijeMgr">
+                        <h3 class="text-info">Rezervacija medjugradske karte</h3><br/>
+                        <h:dataTable style="form-control" value="#{regkor.zahteviMgr}" var="i" border="1">
+                            <h:column>
+                                <f:facet name="header">
+                                    Prevoznik: od - do
+                                </f:facet>
+                                <h:outputLabel styleClass="control-label text-info" value="#{i.prevoznik}: #{i.od_do}"/>
+                            </h:column>
+                            <h:column>
+                                <f:facet name="header">
+                                    Status zahteva
+                                </f:facet>
+                                <h:outputLabel styleClass="control-label text-muted" value="Neobradjen" rendered="#{i.status eq 0}"/>
+                                <h:outputLabel styleClass="control-label text-danger" value="Odbijen" rendered="#{i.status eq -1}"/>
+                                <h:outputLabel styleClass="control-label text-success" value="Prihvacen" rendered="#{i.status eq 1}"/>
+                            </h:column>
+                        </h:dataTable>
+                    </h:form>
+                </div>
+            </div>
+            <br/>
+            <div class="row justify-content-around">
+                <div class="col-md-4">
+                    <h:form id="rezgr">
+                        <h3 class="text-info">Rezervisi mesecnu/godisnju karticu</h3><br/>
+                        <h:panelGrid columns="2">
+                            <h:outputLabel styleClass="control-label" value="Trajanje:"/>
+                            <h:selectOneMenu styleClass="form-control" value="#{regkor.trajanje_rezervacije}">
+                                <f:ajax listener="#{regkor.cenaKarte()}" render="@form"/>
+                                <f:selectItem itemLabel="- - Izaberite trajanje - -" itemValue="0"/>
+                                <f:selectItem itemLabel="Mesecna" itemValue="1"/>
+                                <f:selectItem itemLabel="Godisnja" itemValue="12"/>
+                            </h:selectOneMenu>
+
+                            <h:outputLabel value="Cena:" styleClass="control-label" rendered="#{regkor.trajanje_rezervacije ne 0}"/>
+                            <h:outputText id="cena" styleClass="form-control" value="#{regkor.cena}" rendered="#{regkor.trajanje_rezervacije ne 0}"/>
+                        </h:panelGrid><br/>
+                        <h:commandButton value="Posalji zahtev" action="#{regkor.addRezervacijuGr()}" styleClass="btn btn-info offset-md-4" rendered="#{regkor.trajanje_rezervacije ne 0}">
+                            <f:ajax execute="rezgr" render="@all" />
+                        </h:commandButton>
+                    </h:form>
+                </div>
+                <div class="col-md-4"></div>
+            </div>
+        </h:form>
+        <br/><br/><br/>
+        <footer class="fixed-bottom bg-light">
+            <div class="container-fluid text-center">
+                <p><b>© 2018 Copyright:</b> Djordje Malesevic 0399/2015</p>
+            </div>
+        </footer>
+    </h:body>
+</html>

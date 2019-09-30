@@ -1,0 +1,258 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://xmlns.jcp.org/jsf/core"
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets"
+      xmlns:c="http://xmlns.jcp.org/jsp/jstl/core">
+    <h:head>
+        <title>Admin</title>
+        <link href="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/css/bootstrap.min.css" rel="stylesheet" id="bootstrap-css"/>
+        <script src="//maxcdn.bootstrapcdn.com/bootstrap/4.1.1/js/bootstrap.min.js"></script>
+        <script src="//cdnjs.cloudflare.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    </h:head>
+
+    <h:body>
+        <h:form id="Navigacija">
+            <div class="fixed-top">
+                <nav class="navbar navbar-expand-sm bg-light">
+                    <div class="col-md-4">
+                        <ui class="navbar-nav">
+                            <li class="nav-item">
+                                <div class="nav-link text-info"><b>Administrator:</b></div>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminGrads" ajax="true" update="@form">
+                                    Gradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="newxhtml" ajax="true" update="@form">
+                                    Medjugradske linije
+                                </p:commandLink>
+                            </li>
+                            <li class="nav-item">
+                                <p:commandLink styleClass="nav-link text-info" action="AdminRequests" ajax="true" update="@form">
+                                    Zahtevi
+                                </p:commandLink>
+                            </li>
+                        </ui>
+                    </div>
+                    <div class="col-md-4"/>
+                    <div class="col-md-4 text-right">
+                        <h:commandLink styleClass="text-info" value="Logout" action="#{loginctrl.LogOut()}"/>
+                    </div>
+                </nav>
+            </div><br/><br/>
+            <div class="jumbotron jumbotron-fluid">
+                <div class="container">
+                    <h3 class="text-info">Medjugradske linije</h3>
+                    <p>Dodavanje novih linija, novih prevoznika, novih vozaca i novih autobusa</p>
+                </div>
+            </div>
+        </h:form>
+
+
+        <div class="row justify-content-around">
+
+            <div class="col-md-4">
+                <h:form id="formNewLinija">
+                    <!-- Forma za dodavanje nove linije sa STEPS -->
+                    <h2 class="text-info">Dodaj liniju</h2><br/>
+                    <ul class="nav nav-pills">
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 1" styleClass="#{admin.currStep eq 0? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 2" styleClass="#{admin.currStep eq 1? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 3" styleClass="#{admin.currStep eq 2? 'nav-link active':'nav-link'}"/>
+                        </li>
+                        <li class="nav-item">
+                            <h:outputLabel value="Step 4" styleClass="#{admin.currStep eq 3? 'nav-link active':'nav-link'}"/>
+                        </li>
+                    </ul>
+                    <h:panelGrid id="step0" columns="3" rendered="#{admin.currStep == 0}">
+
+                        <h:outputLabel value="Prevoznik:" styleClass="control-label"/>
+                        <h:selectOneMenu value="#{admin.prevoznik_id}" styleClass="form-control">
+                            <f:selectItem itemLabel="- - Izaberite prevoznika - -" itemValue="0"/>
+                            <f:selectItems value="#{admin.prevoznici}" var="pr" itemLabel="#{pr.naziv}" itemValue="#{pr.id}"/>
+                        </h:selectOneMenu>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Polaziste:" styleClass="control-label"/>
+                        <h:inputText styleClass="form-control" value="#{admin.polaziste}"/>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Odrediste:" styleClass="control-label"/>
+                        <h:inputText styleClass="form-control" value="#{admin.odrediste}"/>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Broj medjustanica:" styleClass="control-label"/>
+                        <h:inputText styleClass="form-control" value="#{admin.brMedjustanica}"/>
+                        <h:panelGroup/>
+
+                    </h:panelGrid>
+                    <h:panelGrid id="step1" columns="2" rendered="#{admin.currStep == 1}" >
+                        <h:panelGrid columns="1" rendered="#{admin.currStep == 1}" cellpadding="2">
+                            <c:forEach items="#{admin.brojMedjust}" var="i">
+                                <h:outputLabel styleClass="control-label" value="Stanica #{i}:"/>
+                            </c:forEach>
+                        </h:panelGrid>
+                        <h:panelGrid columns="1" rendered="#{admin.currStep == 1}" cellpadding="2"> 
+                            <c:forEach items="#{admin.medjustanice}" var="i">
+                                <h:inputText styleClass="form-control" value="#{i}"/>
+                            </c:forEach>
+                        </h:panelGrid>
+                    </h:panelGrid>
+                    <h:dataTable id="step2" value="#{admin.linijedetIDs}" var="ld" border="0" rendered="#{admin.currStep==2}">
+                        <h:column>
+                            <h:outputLabel styleClass="control-label" value="#{ld.naziv}:"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Vreme dolaska</f:facet>
+                            <p:calendar value="#{ld.dolazak}" pattern="MM/dd/yyyy HH:mm" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        </h:column>
+                        <h:column>
+                            <f:facet name="header">Vreme polaska</f:facet>
+                            <p:calendar value="#{ld.polazak}" pattern="MM/dd/yyyy HH:mm" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        </h:column>
+                    </h:dataTable>
+                    <h:panelGrid id="step3" columns="2" rendered="#{admin.currStep == 3}">
+                        <h:outputLabel value="Vozac:" styleClass="control-label"/>
+                        <h:selectOneMenu value="#{admin.vozac_id}" styleClass="form-control">
+                            <f:selectItem itemValue="0" itemLabel="- - Izaberite vozaca - -"/>
+                            <f:selectItems value="#{admin.vozaciLista}" var="vz" itemLabel="#{vz.ime} #{vz.prezime}" itemValue="#{vz.id}" />
+                        </h:selectOneMenu>
+
+                        <h:outputLabel value="Autobusi:" styleClass="control-label"/>
+                        <h:selectOneMenu value="#{admin.autobus_id}" styleClass="form-control">
+                            <f:selectItem itemValue="0" itemLabel="- - Izaberite autobus - -"/>
+                            <f:selectItems value="#{admin.autobusiLista}" var="vz" itemLabel="#{vz.marka} #{vz.model}" itemValue="#{vz.id}" />
+                        </h:selectOneMenu>
+                    </h:panelGrid>
+                    <br/>
+                    <h:commandButton action="#{admin.Dalje()}" value="Dalje" styleClass="btn active offset-md-6">
+                        <f:ajax execute="step0 step1 step2 step3" render="@form"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+
+            <div class="col-md-4">
+                <h:form id="formPrevoznik">
+                    <h2 class="text-info">Dodaj prevoznika</h2><br/>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Naziv:" styleClass="control-label"/>
+                        <h:inputText id="naziv" styleClass="form-control" value="#{admin.nazivPr}" required="true" requiredMessage="Unesite naziv prevoznika!"/>
+                        <h:message for="naziv" style="color:red"/>
+
+                        <h:outputLabel value="Adresa:" styleClass="control-label"/>
+                        <h:inputText id="adresa" styleClass="form-control" value="#{admin.adresaPr}" required="true" requiredMessage="Unesite adresu!"/>
+                        <h:message for="adresa" style="color:red"/>
+
+                        <h:outputLabel value="Kontakt telefon:" styleClass="control-label"/>
+                        <h:inputText id="kon" styleClass="form-control" value="#{admin.kontaktPr}" required="true" requiredMessage="Unesite kontakt telefon!"/>
+                        <h:message for="kon" style="color:red"/>
+
+                    </h:panelGrid>
+                    <br/>
+                    <h:commandButton action="#{admin.addPrevoznik()}" value="Dodaj" styleClass="btn btn-info offset-md-5">
+                        <f:ajax execute="naziv adresa kon" render="@all"/>
+                    </h:commandButton>
+
+                </h:form>
+            </div>
+        </div>
+        <div class="row justify-content-around">
+            <div class="col-md-4">
+                <h:form id="formVozac">
+                    <h2 class="text-info">Dodaj vozaca</h2><br/>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Prevoznik:" styleClass="control-label"/>
+                        <h:selectOneMenu id="prevoznikSelect" value="#{admin.prevoznik_id}" styleClass="form-control">
+                            <f:selectItem itemLabel="- - Izaberite prevoznika - -" itemValue="0"/>
+                            <f:selectItems value="#{admin.prevoznici}" var="pr" itemLabel="#{pr.naziv}" itemValue="#{pr.id}"/>
+                        </h:selectOneMenu>
+
+                        <h:panelGroup/>
+                        <h:outputLabel value="Ime:" styleClass="control-label"/>
+                        <h:inputText id="ime" styleClass="form-control" value="#{admin.ime}" required="true" requiredMessage="Unesite ime!"/>
+                        <h:message for="ime" style="color:red"/>
+
+                        <h:outputLabel value="Prezime:" styleClass="control-label"/>
+                        <h:inputText id="prez" styleClass="form-control" value="#{admin.prezime}" required="true" requiredMessage="Unesite prezime!"/>
+                        <h:message for="prez" style="color:red"/>
+
+                        <h:outputLabel value="Datum rodjenja:" styleClass="control-label"/>
+                        <p:calendar id="rod" value="#{admin.dtmRodjenja}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        <h:message for="rod" style="color:red"/>
+
+                        <h:outputLabel value="Poceo da radi:" styleClass="control-label"/>
+                        <p:calendar id="poc" value="#{admin.dtmPocetka}" yearRange="c-100:c+100" navigator="true" required="true" requiredMessage="Unesite datum!"/>
+                        <h:message for="poc" style="color:red"/>
+
+                    </h:panelGrid>
+                    <br/>
+                    <h:commandButton action="#{admin.addVozac()}" value="Dodaj" styleClass="btn btn-info offset-md-6">
+                        <f:ajax execute="prevoznikSelect ime prez rod poc" render="@form"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+            <div class="col-md-4">
+
+                <h:form id="formAutobus" enctype="multipart/form-data">
+
+                    <h2 class="text-info">Dodaj autobus</h2><br/>
+                    <h:panelGrid columns="3">
+                        <h:outputLabel value="Prevoznik:" styleClass="control-label"/>
+                        <h:selectOneMenu id="pr" value="#{admin.prevoznik_id}" styleClass="form-control">
+                            <f:selectItem itemLabel="- - Izaberite prevoznika - -" itemValue="0"/>
+                            <f:selectItems value="#{admin.prevoznici}" var="pr" itemLabel="#{pr.naziv}" itemValue="#{pr.id}"/>
+                        </h:selectOneMenu>
+                        <h:panelGroup/>
+
+                        <h:outputLabel value="Marka:" styleClass="control-label"/>
+                        <h:inputText  id="mar" styleClass="form-control" value="#{admin.marka}" required="true" requiredMessage="Unesite model!"/>
+                        <h:message for="mar" style="color:red"/>
+
+                        <h:outputLabel value="Model:" styleClass="control-label"/>
+                        <h:inputText id="mod" styleClass="form-control" value="#{admin.model}" required="true" requiredMessage="Unesite model!"/>
+                        <h:message for="mod" style="color:red"/>
+
+                        <h:outputLabel value="Broj sedista:" styleClass="control-label"/>
+                        <h:inputText id="sed" styleClass="form-control" value="#{admin.br_sedista}"/>
+                        <h:message for="sed" style="color:red"/>
+
+
+                        <h:outputLabel value="Dodaj fotografiju:" styleClass="control-label"/>
+                        <p:fileUpload id="foto" value="#{admin.currImg}" mode="simple" rendered="#{admin.photos.size() ne 5}"/>
+                        <h:outputText id="maxphoto" styleClass="form-control" value="Dodali ste maksimalnih 5 fotografija!" rendered="#{admin.photos.size() eq 5}" />
+                        <h:commandButton value="Dodaje" action="#{admin.storeImage()}" styleClass="btn btn-success" rendered="#{admin.photos.size() ne 5}">
+                            <f:ajax execute="foto mar mod sed pr" render="@form" />
+                        </h:commandButton>
+
+                    </h:panelGrid>
+                    <br/>
+                    <h:commandButton action="#{admin.addAutobus()}" value="Dodaj" styleClass="btn btn-info offset-md-5">
+                        <f:ajax execute="mar mod sed pr" render="@form"/>
+                    </h:commandButton>
+                </h:form>
+            </div>
+        </div>
+        <br/><br/>
+        <footer class="fixed-bottom bg-light">
+            <div class="container-fluid text-center">
+                <p><b>© 2018 Copyright:</b> Djordje Malesevic 0399/2015</p>
+            </div>
+        </footer>
+    </h:body>
+</html>
